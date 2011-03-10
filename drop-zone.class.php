@@ -14,7 +14,7 @@ class DropZone extends WP_Widget {
 		$thumbnail_max_width = $instance['thumbnail_max_width'];
 		$thumbnail_max_height = $instance['thumbnail_max_height'];
 
-		$postID = get_option($args['id']);
+		$postID = get_option($args['widget_id']);
 
 		// check if we have a thumb and the height/width is set
 		if($show_post_thumbnails && $thumbnail_max_width && $thumbnail_max_height){
@@ -28,7 +28,7 @@ class DropZone extends WP_Widget {
 			$drop_zone_excerpt = $this->trim_excerpt($post->post_content,20); // the drop-zone excerpt
 			$the_widgets_pos_id = substr($args['widget_id'], strpos($args['widget_id'], "-") + 1); // we need the id
 
-			echo "<div class=\"widget-container\" data-url=\"".$link."\" data-index=\"0\" data-removable=\"true\" data-droppable=\"true\" data-position=\"".$args['id'].":".$the_widgets_pos_id."\">";
+			echo "<div class=\"widget-container\" data-url=\"".$link."\" data-index=\"0\" data-removable=\"true\" data-droppable=\"true\" data-position=\"".$args['id'].":".$args['widget_id']."\">";
 
 			if($post_thumbnail_id){
 				$img_url = $this->get_image_url($post_thumbnail_id, $thumbnail_max_width, $thumbnail_max_height);
@@ -43,7 +43,7 @@ class DropZone extends WP_Widget {
 
 			echo "</div>";
 		} else {
-			echo "<div class=\"droppable widget-container\" data-url=\"".$post->guid."\" data-index=\"0\" data-droppable=\"true\" data-position=\"".$args['id'].":".$the_widgets_pos_id."\">";
+			echo "<div class=\"droppable widget-container\" data-url=\"".$post->guid."\" data-index=\"0\" data-droppable=\"true\" data-position=\"".$args['id'].":".$args['widget_id']."\">";
 			echo "</div>";
 		}
     }

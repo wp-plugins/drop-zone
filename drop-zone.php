@@ -4,7 +4,7 @@ Plugin Name: Drop-zone
 Plugin URI: http://www.fosseus.se
 Description: Drag drop frontend widget
 Author: Johannes Fosseus
-Version: 1.2
+Version: 1.2.1
 */
 
 include(ABSPATH . 'wp-includes/pluggable.php');
@@ -48,11 +48,11 @@ function drop_zone_drop() {
 		die();
 	}
 
-	// find the "widgets id"
-	$widget_id = substr($_GET['infoBlock']['position'], strpos($_GET['infoBlock']['position'], ":") + 1);
+	// split the position string
+	list ($widgetarea, $position) = explode(':', $_GET['infoBlock']['position']);
 
-	// Find the widgets "position"
-	list ($position, $after) = explode(':', $_GET['infoBlock']['position']);
+	// find the "widgets id"
+	$widget_id = substr($position, strpos($position, "-") + 1);
 
 	// use it to get the specific widget options
 	$instance = get_option('widget_drop_zone');
@@ -78,7 +78,7 @@ function drop_zone_drop() {
 			echo "<a href=\"".$link."\"><img src=\"".$img_url."\"></a>";
 		}
 
-		echo $wp_registered_sidebars[$position]['before_title']."<a href=\"".$_GET['infoBlock']['url']."\">".$post->post_title."</a>".$wp_registered_sidebars[$position]['after_title'];
+		echo $wp_registered_sidebars[$widgetarea]['before_title']."<a href=\"".$_GET['infoBlock']['url']."\">".$post->post_title."</a>".$wp_registered_sidebars[$widgetarea]['after_title'];
 
 		if($show_excerpt){
 		echo "<a href=\"".$_GET['infoBlock']['url']."\">".$drop_zone_excerpt."</a>";
@@ -104,7 +104,7 @@ function drop_zone_remove(){
 	if (!wp_verify_nonce($_POST['nonce'],'drop-zone-nonce')){
 		die();
 	}
-	list ($position, $after) = explode(':', $_POST['position']);
+	list ($widgetarea, $position) = explode(':', $_POST['position']);
 	$postID = url_to_postid($_POST['url']);
 	$DropZone->remove($position,$postID);
 	die;
