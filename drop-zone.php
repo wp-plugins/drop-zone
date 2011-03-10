@@ -4,7 +4,7 @@ Plugin Name: Drop-zone
 Plugin URI: http://www.fosseus.se
 Description: Drag drop frontend widget
 Author: Johannes Fosseus
-Version: 1.1
+Version: 1.2
 */
 
 include(ABSPATH . 'wp-includes/pluggable.php');
@@ -40,7 +40,8 @@ function drop_zone_init(){
 
 // ajax callback
 function drop_zone_drop() {
-	global $wpdb,$DropZone;
+	global $wpdb,$DropZone,$wp_registered_sidebars;
+
 
 	// secutity
 	if (!wp_verify_nonce($_GET['nonce'],'drop-zone-nonce')){
@@ -48,7 +49,10 @@ function drop_zone_drop() {
 	}
 
 	// find the "widgets id"
-	$widget_id = substr($_GET['infoBlock']['position'], strpos($_GET['infoBlock']['position'], "-") + 1);
+	$widget_id = substr($_GET['infoBlock']['position'], strpos($_GET['infoBlock']['position'], ":") + 1);
+
+	// Find the widgets "position"
+	list ($position, $after) = explode(':', $_GET['infoBlock']['position']);
 
 	// use it to get the specific widget options
 	$instance = get_option('widget_drop_zone');
@@ -56,7 +60,6 @@ function drop_zone_drop() {
 	$show_post_thumbnails = $instance[$widget_id]['show_post_thumbnails'];
 	$thumbnail_max_width = $instance[$widget_id]['thumbnail_max_width'];
 	$thumbnail_max_height = $instance[$widget_id]['thumbnail_max_height'];
-
 	$postID = url_to_postid($_GET['infoBlock']['url']); // get the postID
 
 	// only get thumbnail_id if we need to and height/width is set
@@ -68,14 +71,14 @@ function drop_zone_drop() {
 		$post = get_post($postID); // get the post, post_excerpt
 		$drop_zone_excerpt = $DropZone->trim_excerpt($post->post_content,20); // the drop-zone excerpt
 
-		echo "<div class=\"widget-container\" data-edited=\"true\" data-url=\"".$_GET['infoBlock']['url']."\" data-index=\"0\" data-removable=\"true\" data-droppable=\"true\" data-position=\"".$_GET['infoBlock']['position']."\">";
+		echo "<div class=\"widget-container\" data-url=\"".$_GET['infoBlock']['url']."\" data-index=\"0\" data-removable=\"true\" data-droppable=\"true\" data-position=\"".$_GET['infoBlock']['position']."\">";
 
 		if($post_thumbnail_id){
 			$img_url = $DropZone->get_image_url($post_thumbnail_id, $thumbnail_max_width, $thumbnail_max_height);
 			echo "<a href=\"".$link."\"><img src=\"".$img_url."\"></a>";
 		}
 
-		echo "<h3 class=\"widget-title\"><a href=\"".$_GET['infoBlock']['url']."\">".$post->post_title."</a></h3>";
+		echo $wp_registered_sidebars[$position]['before_title']."<a href=\"".$_GET['infoBlock']['url']."\">".$post->post_title."</a>".$wp_registered_sidebars[$position]['after_title'];
 
 		if($show_excerpt){
 		echo "<a href=\"".$_GET['infoBlock']['url']."\">".$drop_zone_excerpt."</a>";
@@ -84,7 +87,12 @@ function drop_zone_drop() {
 		echo "</div>";
 
 		// and svave
-		$DropZone->save_on_drop($_GET['infoBlock']['position'],$postID);
+		$DropZone->save_on_drop($position,$postID);
+	}
+
+	// clear the supercache, if supercache is installed
+	if(function_exists('wp_cache_clear_cache')){
+		wp_cache_clear_cache();
 	}
 
 	die;
@@ -96,8 +104,9 @@ function drop_zone_remove(){
 	if (!wp_verify_nonce($_POST['nonce'],'drop-zone-nonce')){
 		die();
 	}
+	list ($position, $after) = explode(':', $_POST['position']);
 	$postID = url_to_postid($_POST['url']);
-	$DropZone->remove($_POST['position'],$postID);
+	$DropZone->remove($position,$postID);
 	die;
 }
 

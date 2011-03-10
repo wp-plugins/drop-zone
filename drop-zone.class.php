@@ -14,7 +14,7 @@ class DropZone extends WP_Widget {
 		$thumbnail_max_width = $instance['thumbnail_max_width'];
 		$thumbnail_max_height = $instance['thumbnail_max_height'];
 
-		$postID = get_option($args['widget_id']);
+		$postID = get_option($args['id']);
 
 		// check if we have a thumb and the height/width is set
 		if($show_post_thumbnails && $thumbnail_max_width && $thumbnail_max_height){
@@ -22,18 +22,20 @@ class DropZone extends WP_Widget {
 		}
 
 		if($postID){
+
 			$post = get_post($postID); // get the post, post_excerpt
 			$link = get_permalink($postID);
 			$drop_zone_excerpt = $this->trim_excerpt($post->post_content,20); // the drop-zone excerpt
+			$the_widgets_pos_id = substr($args['widget_id'], strpos($args['widget_id'], "-") + 1); // we need the id
 
-			echo "<div class=\"widget-container\" data-url=\"".$link."\" data-index=\"0\" data-removable=\"true\" data-droppable=\"true\" data-position=\"".$args['widget_id']."\">";
+			echo "<div class=\"widget-container\" data-url=\"".$link."\" data-index=\"0\" data-removable=\"true\" data-droppable=\"true\" data-position=\"".$args['id'].":".$the_widgets_pos_id."\">";
 
 			if($post_thumbnail_id){
 				$img_url = $this->get_image_url($post_thumbnail_id, $thumbnail_max_width, $thumbnail_max_height);
 				echo "<a href=\"".$link."\"><img src=\"".$img_url."\"></a>"; // size/width missing, and image is not cropped...
 			}
 
-			echo "<h3 class=\"widget-title\"><a href=\"".$link."\">".$post->post_title."</a></h3>";
+			echo $args['before_title']."<a href=\"".$link."\">".$post->post_title."</a>".$args['after_title'];
 
 			if($show_excerpt){
 			echo "<a href=\"".$link."\">".$drop_zone_excerpt."</a>";
@@ -41,7 +43,7 @@ class DropZone extends WP_Widget {
 
 			echo "</div>";
 		} else {
-			echo "<div class=\"droppable widget-container\" data-url=\"".$post->guid."\" data-index=\"0\" data-removable=\"true\" data-droppable=\"true\" data-position=\"".$args['widget_id']."\">";
+			echo "<div class=\"droppable widget-container\" data-url=\"".$post->guid."\" data-index=\"0\" data-droppable=\"true\" data-position=\"".$args['id'].":".$the_widgets_pos_id."\">";
 			echo "</div>";
 		}
     }
