@@ -22,7 +22,7 @@ You can choose if you want to use excepts, and images, and the image max heigth 
 == Changelog ==
 
 = 1.2.1 =
-Minor bugfix
+* Minor bugfix
 
 = 1.2 =
 * Added support for wp super cache wp_cache_clear_cache() on drop/save
