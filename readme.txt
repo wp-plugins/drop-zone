@@ -4,11 +4,11 @@ Tags: Drag drop, widget, front end
 Requires at least: 3.1
 Tested up to: 3.1
 
-Adds drop zones to your site front end, drop some post on the zones and they will stay. Simple drag/drop layout tool
+Adds a widget that adds "drop zones" to your site front end. Then you can drop posts to the zones and they will stay, magic!
 
 == Description ==
 
-This is a small but great plugin that makes it possible to add drop zones to your frontend. It uses HTML5 native drag/drop javascript methods som use a modern browser!
+This is a small but great plugin that makes it possible to add drop zones to your frontend. It uses HTML5 native drag/drop javascript methods so use a modern browser!
 
 **Options**
 You can choose if you want to use excepts, and images, and the image max heigth and width 
