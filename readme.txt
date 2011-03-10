@@ -21,6 +21,9 @@ You can choose if you want to use excepts, and images, and the image max heigth 
 
 == Changelog ==
 
+= 1.3 =
+* Major js scripting cleanup by Peo Bondesson
+
 = 1.2.1 =
 * Minor bugfix
 

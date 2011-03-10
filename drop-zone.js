@@ -1,52 +1,35 @@
-var addEvent = (function(){
-	return function (el, type, fn) {
-		if (el && el.nodeName || el === window) {
-            el.addEventListener(type, fn, false);
-            } else if (el && el.length) {
-            for (var i = 0; i < el.length; i++) {
-                addEvent(el[i], type, fn);
-            }
-        }
-    };
-})();
-
 DropZone = {
-    activeChanges:[],   
-    droppable:function(elements) {
-	jQuery(elements).each(function(){
-		jQuery(this).removeAttr('data-new');
-        });    
-        addEvent(elements, 'dragover', function (e) {
-            if (e.preventDefault) e.preventDefault(); // allows us to drop
-            jQuery(this).addClass('over');
-            return false;
+    droppable:function(elements){
+
+    	jQuery(elements).bind('dragover',function(e){
+    		 if (e.preventDefault) e.preventDefault();
+             jQuery(this).addClass('over');
         });
-        addEvent(elements, 'dragstart', function (e) {
+    	jQuery(elements).bind('dragstart',function(e){
         	jQuery('#dragged').attr('id', '');
         	jQuery(this).attr('id', 'dragged');
         });
-        addEvent(elements, 'dragleave', function () {
+    	jQuery(elements).bind('dragleave',function(e){
         	jQuery(this).removeClass('over');
         });
-        addEvent(elements, 'drop', function (e) {
+    	jQuery(elements).bind('drop',function(e){
             if (e.stopPropagation) e.stopPropagation();
             jQuery('#dragged').attr('id', '');
-            DropZone.setArticleFromUrl(e.dataTransfer.getData('Text'), this);
+            DropZone.setArticleFromUrl(e.originalEvent.dataTransfer.getData('Text'), this);
             jQuery('#dragged').attr('id', '');
-            return false;
         });
     },
     trash:function(elements) {
-        addEvent(elements, 'dragover', function (e) {
+    	jQuery(elements).bind('dragover',function(e){
             if (e.preventDefault) e.preventDefault(); // allows us to drop
             return false;
         });
-        addEvent(elements, 'drop', function (e) {
+    	jQuery(elements).bind('drop',function(e){
             if (e.preventDefault) e.preventDefault(); // stops redirecting
             var dragged = document.getElementById('dragged');
             if (dragged !== null) {
             	jQuery('#dragged').attr('id', '');
-                if (dragged.getAttribute('data-removable') == 'true') {
+                if (dragged.getAttribute('data-removable') == 'true'){
                     DropZone.removeElement(dragged);
                 }
             }
@@ -67,35 +50,18 @@ DropZone = {
     },
     fetchElement:function(infoBlock, mainElement) {    	
         jQuery.get(DropZoneFront.ajaxurl, { action : 'drop-zone-submit', nonce : DropZoneFront.nonce, infoBlock: infoBlock }, function(data) {
-            var targets = jQuery('[data-position=' + infoBlock.position + '][data-index="' + infoBlock.index + '"]');
-            data=jQuery(data).attr('data-new','true');
-            if (mainElement.getAttribute('data-position') == 'fake') {
-                var el = jQuery('div[data-position=fake][data-addable=true]');
-                el.before(data);
-            } else {
-            	jQuery(mainElement).before(data.addClass(infoBlock.first_last));
-                if (!(mainElement.getAttribute('data-addable') == 'true') ||
-                        (mainElement.getAttribute('data-removable') == 'true' && mainElement.getAttribute('data-index') == -1)) {
-                	jQuery(targets).remove();
-                } else if (mainElement.getAttribute('data-removable')) {
-                	jQuery(mainElement).remove();
-                }
-            }
-            var elements = document.querySelectorAll('[data-position=' + infoBlock.position + '][data-index="' + infoBlock.index + '"][data-droppable=true][data-new=true]');           
-            DropZone.droppable(elements);
+        	var html=jQuery(data);
+        	DropZone.droppable(html);
+        	jQuery(mainElement).before(html).remove();
         });
     },
     setArticleFromUrl:function(url, element) {
         var block = DropZone.getDataBlockFromElement(element);
         block.url = url;
-        if (!(element.getAttribute('data-addable') == 'true')) {
-            DropZone.activeChanges[block.position + '-' + block.index] = block;
-        }
         DropZone.fetchElement(block, element);
     }
 };
-addEvent(document, 'DOMContentLoaded', function() {
+jQuery(document).ready(function(){
     DropZone.droppable(document.querySelectorAll("[data-droppable=true]"));
     DropZone.trash(document.querySelector('body'));
-    document.defaultAction = false;
 });

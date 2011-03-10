@@ -3,8 +3,8 @@
 Plugin Name: Drop-zone
 Plugin URI: http://www.fosseus.se
 Description: Drag drop frontend widget
-Author: Johannes Fosseus
-Version: 1.2.1
+Author: Johannes Fosseus, Peo Bondesson (scripting)
+Version: 1.3
 */
 
 include(ABSPATH . 'wp-includes/pluggable.php');
