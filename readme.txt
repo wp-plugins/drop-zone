@@ -1,6 +1,6 @@
 === Drop-Zone ===
 Contributors: Johannes Fosseus
-Tags: Drag drop, widget, front end
+Tags: Drag drop, widget, front end, layout
 Requires at least: 3.1
 Tested up to: 3.1
 
